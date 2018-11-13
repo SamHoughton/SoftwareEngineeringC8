@@ -1,5 +1,5 @@
 import requests
-#response = requests.get("http://www.omdbapi.com/?t=blade&apikey=3f3265e5")
+response = requests.get("http://www.omdbapi.com/?t=blade&apikey=3f3265e5")
 #print(response.content)
 
 import tkinter as tk
@@ -17,12 +17,14 @@ class Application(tk.Frame):
         
         self.Search = tk.Entry()
         self.Search.pack()
-        #self.SearchContents = StringVar()
+        self.SearchContents = tk.StringVar()
+        
         # set it to some value
-        #self.SearchContents.set("Arrival")
+        self.SearchContents.set("Arrival")
+        
         # tell the entry widget to watch this variable
-        #self.Search["textvariable"] = self.SearchContents
-        #self.Search.bind('<Key-Return>', self.MovieSearch)
+        self.Search["textvariable"] = self.SearchContents
+        self.Search.bind('<Key-Return>', self.MovieSearch)
         
         self.MovieBtn = tk.Button(self)
         self.MovieBtn["text"] = "Find a\n Random Movie"
@@ -33,11 +35,11 @@ class Application(tk.Frame):
                               command=self.master.destroy)
         self.quit.pack(side="bottom")
 
-    def MovieSearch(self):
-        print(self.Search["textvariable"])
-        #a = ["http://www.omdbapi.com/?t=" + (self.Search["textvariable"] + "&apikey=3f3265e5"
-        #response = requests.get(a)
-        #print(response.content)
+    def MovieSearch(self, event):
+        print(self.SearchContents.get())
+        response = requests.get("http://www.omdbapi.com/?t=%s&apikey=3f3265e5" % (self.SearchContents.get()))
+        print(response.content)
+        print("")
 
 root = tk.Tk()
 app = Application(master=root)
