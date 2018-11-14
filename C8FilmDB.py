@@ -2,6 +2,14 @@ import requests
 response = requests.get("http://www.omdbapi.com/?t=blade&apikey=3f3265e5")
 #print(response.content)
 
+import omdb
+
+#res = omdb.request(t='Lion King', y=1994, r='json')
+#xml_content = res.content
+print(omdb.search(t='Lion King') )
+
+
+
 import tkinter as tk
 
 class Application(tk.Frame):
@@ -40,6 +48,9 @@ class Application(tk.Frame):
         response = requests.get("http://www.omdbapi.com/?t=%s&apikey=3f3265e5" % (self.SearchContents.get()))
         print(response.content)
         print("")
+        
+        self.TitleLabel
+        
 
 root = tk.Tk()
 app = Application(master=root)
