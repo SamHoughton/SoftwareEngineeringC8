@@ -2,11 +2,11 @@ import requests
 response = requests.get("http://www.omdbapi.com/?t=blade&apikey=3f3265e5")
 #print(response.content)
 
-import omdb
+#import omdb
 
 #res = omdb.request(t='Lion King', y=1994, r='json')
 #xml_content = res.content
-print(omdb.search(t='Lion King') )
+#print(omdb.search(t='Lion King') )
 
 
 
@@ -18,10 +18,11 @@ class Application(tk.Frame):
         self.master = master
         self.pack()
         self.create_widgets()
-
-    
-
+        tk.geometry("500x500")
+        
     def create_widgets(self):
+        
+        self.winfo_toplevel().title("Movie Information Client")
         
         self.Search = tk.Entry()
         self.Search.pack()
@@ -43,13 +44,13 @@ class Application(tk.Frame):
                               command=self.master.destroy)
         self.quit.pack(side="bottom")
 
-    def MovieSearch(self, event):
+    def MovieSearch(self):
         print(self.SearchContents.get())
         response = requests.get("http://www.omdbapi.com/?t=%s&apikey=3f3265e5" % (self.SearchContents.get()))
         print(response.content)
         print("")
         
-        self.TitleLabel
+        #self.TitleLabel
         
 
 root = tk.Tk()
