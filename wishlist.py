@@ -25,22 +25,56 @@ class Application(tk.Frame):
         
 
     def create_widgets(self):
-
-        home = tk.Button(text="Home", bg="#a1dbcd") # command=self.master.destroy) #quit application button
-        home.pack(side="left", padx=10, pady=10) #placement of button
         
-        wishlist = tk.Label(bg="#a1dbcd") #creates label
+        title_frame = tk.Frame(root, bg="#a1dbcd")
+        title_frame.pack(side="top")
+
+        home = tk.Button(title_frame, text="Home", bg="#a1dbcd") # command=self.master.destroy) #quit application button
+        home.pack(side="left", padx=50, pady=10) #placement of button
+        
+        wishlist = tk.Label(title_frame, bg="#a1dbcd") #creates label
         wishlist["text"] = "WISHLIST" #text on label
         wishlist.pack(side="left", padx=10, pady=10)
         wishlist.configure(font="titleFont")
         
-       
-        film = tk.Button(text="will be a film title", bg="#a1dbcd") #, command=self.display_film) #creates button
-        film["command"] = self.display_film #create command when button is pressed
-        film.pack(side="bottom") #placement of button
-
-        quit = tk.Button(text="Close Application", fg="red", bg="#a1dbcd", command=self.master.destroy) #quit application button
+        search_function = tk.Entry(title_frame, bg="white")
+        search_function.pack(side="left", padx=10, pady=10)
+        
+        main_frame = tk.Frame(root, bg="#a1dbcd")
+        main_frame.pack(side="bottom")
+        
+        scrollbar = tk.Scrollbar(main_frame)
+        scrollbar.pack(side="right", fill=tk.Y)
+        
+        quit = tk.Button(main_frame, text="Close Application", fg="red", bg="#a1dbcd", command=self.master.destroy) #quit application button
         quit.pack(side="bottom") #placement of button
+        
+        film_frame = tk.LabelFrame(main_frame, width=500, height=150, bg="#a1dbcd")
+        film_frame.pack(side="bottom")
+        
+        info_frame = tk.Frame(film_frame, bg="#a1dbcd")
+        info_frame.pack(side="top", fill=tk.X)
+        
+        title = tk.Label(info_frame, bg="#a1dbcd")
+        title["text"] = "Film Title:"
+        title.pack(side="top", padx=10, pady=10)
+        
+        date = tk.Label(info_frame, bg="#a1dbcd")
+        date["text"] = "Date Added to Wishlist:"
+        date.pack(side="top", padx=10, pady=10)
+                      
+                              
+        mini_frame = tk.Frame(film_frame, bg="#a1dbcd")
+        mini_frame.pack(side="bottom", fill=tk.X)
+                              
+        remove = tk.Button(mini_frame, text="Remove Film", fg="red", bg="#a1dbcd") #, command=self.display_film) #creates button
+        remove["command"] = self.display_film #create command when button is pressed
+        remove.pack(side="right", padx=50)
+        
+        film = tk.Button(mini_frame, text="Show Film Info", bg="#a1dbcd") #, command=self.display_film) #creates button
+        film["command"] = self.display_film #create command when button is pressed
+        film.pack(side="right", padx=50) #placement of button
+
 
 
     def display_film(self): #display_film button command
