@@ -1,11 +1,7 @@
 #============Importing the APIs==================#
-import requests, json, omdb
+import requests, json
 response = requests.get("http://www.omdbapi.com/?t=blade&apikey=3f3265e5")
 movie_dictionary_info = json.loads(response.text)
-
-omdb.set_default('apikey', '3f3265e5')
-res = omdb.request(t='Lion King', y=1994, r='xml')
-xml_content = res.content
 
 import tkinter as tk
 
@@ -132,13 +128,8 @@ class Application(tk.Frame):
  
 #------------Movie Search Function---------------#
     
-    def MovieSearch(self):
-        
-        #print(self.SearchContents.get())
-        #response = requests.get("http://www.omdbapi.com/?t=%s&apikey=3f3265e5" % (self.SearchContents.get()))
-        #print(response.content)
-        #print(omdb.get(title=self.SearchContents.get()))
-        
+    def MovieSearch(self, event=None):
+                
         response = requests.get("http://www.omdbapi.com/?t=%s&apikey=3f3265e5" % (self.SearchContents.get()))
         movie_dictionary_info = json.loads(response.text)
         print(movie_dictionary_info)
