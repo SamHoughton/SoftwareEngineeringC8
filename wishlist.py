@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-#"""
-#Spyder Editor
+"""
+Created on Tue Nov 13 13:56:07 2018
 
-#This is a temporary script file.
-#"""
+@author: Student
+"""
 
 import tkinter as tk
 from tkinter import font
