@@ -4,10 +4,14 @@ Created on Tue Nov 13 14:36:42 2018
 
 @author: Student
 """
+#============Importing the APIs==================#
+import requests, json, datetime
+response = requests.get("http://www.omdbapi.com/?t=blade&apikey=3f3265e5")
+movie_dictionary_info = json.loads(response.text)
 
+now = datetime.datetime.now()
 import tkinter as tk
 from tkinter import font
-
 
 root = tk.Tk()
 titleFont = font.Font(family = "Helvetica", size = 36, weight = "bold")
@@ -30,10 +34,48 @@ class Application(tk.Frame):
     def create_widgets(self):
         
         #winfo_toplevel().title("Movie Information Client - Wishlist)
+
+#============Frame Declarations==================# 
         
         title_frame = tk.Frame(root, bg="#a1dbcd")
         title_frame.pack(side="top", fill=tk.X)
+         
+        main_frame = tk.Frame(root, bg="#a1dbcd")
+        main_frame.pack(side="top", fill=tk.BOTH)
+        
+        #Scrollbar
+        scrollbar = tk.Scrollbar(main_frame)
+        scrollbar.pack(side="right", fill=tk.Y)
+        
+        bottom_frame = tk.Frame(main_frame, bg="#a1dbcd")
+        bottom_frame.pack(side="bottom", fill=tk.X)
+        
+        film_frame = tk.LabelFrame(main_frame, width=500, height=150, bg="white")
+        film_frame.pack(side="top")
+        
+        info_frame = tk.Frame(film_frame, bg="white")
+        info_frame.pack(side="top", fill=tk.X)
+                              
+        mini_frame = tk.Frame(film_frame, bg="white")
+        mini_frame.pack(side="bottom", fill=tk.X)
 
+#============Search Widget======================#   
+        
+        search_function = tk.Entry(title_frame, bg="white")
+        search_function.pack(side="right", padx=50, pady=10)
+        self.SearchContents = tk.StringVar()
+        self.SearchContents.set("Search Here")         
+        # tell the entry widget to watch this variable
+        search_function["textvariable"] = self.SearchContents
+        search_function.bind('<Key-Return>', self.MovieSearch)
+        
+#============Default Declarations===============#   
+        
+        self.LabelDefault = tk.StringVar()
+        self.LabelDefault.set("--")
+     
+#============Labels and Buttons==================#
+        
         home = tk.Button(title_frame, text="Home",fg="white", bd=0, bg="#179184",width=10, height=2) # command=self.master.destroy) #quit application button
         home.pack(side="left", padx=80, pady=10) #placement of button
         
@@ -41,50 +83,23 @@ class Application(tk.Frame):
         wishlist["text"] = "WISHLIST" #text on label
         wishlist.pack(side="left", padx=10, pady=10)
         wishlist.configure(font="titleFont")
-        
-        search_function = tk.Entry(title_frame, bg="white")
-        search_function.pack(side="right", padx=50, pady=10)
-        
-        
-   #     self.SearchContents = tk.StringVar()
-   #     self.SearchContents.set("Arrival")         
-   #     # tell the entry widget to watch this variable
-   #     search_function["textvariable"] = self.SearchContents
-   #     search_function.bind('<Key-Return>', self.MovieSearch)
-   #     
-   #     MovieBtn = tk.Button(self.SearchFrame, padx=3, pady=3)
-   #     MovieBtn["text"] = "Find Movie"
-   #     MovieBtn["command"] = self.MovieSearch
-   #     MovieBtn.pack(side = tk.LEFT)
-        
-        
-        main_frame = tk.Frame(root, bg="#a1dbcd")
-        main_frame.pack(side="top", fill=tk.BOTH)
-        
-        bottom_frame = tk.Frame(main_frame, bg="#a1dbcd")
-        bottom_frame.pack(side="bottom", fill=tk.X)
-        
-        scrollbar = tk.Scrollbar(main_frame)
-        scrollbar.pack(side="right", fill=tk.Y)
-        
-        film_frame = tk.LabelFrame(main_frame, width=500, height=150, bg="white")
-        film_frame.pack(side="top")
-        
-        info_frame = tk.Frame(film_frame, bg="white")
-        info_frame.pack(side="top", fill=tk.X)
-        
+
         title = tk.Label(info_frame, bg="white")
         title["text"] = "Film Title:"
         title.pack(side="top", padx=10, pady=10)
+        #Variable
+        self.MovieTitle = tk.Label(info_frame, padx=3, pady=3, bg="white")
+        self.MovieTitle.pack()
+        self.MovieTitle["textvariable"] = self.LabelDefault
         
         date = tk.Label(info_frame, bg="white")
         date["text"] = "Date Added to Wishlist:"
         date.pack(side="top", padx=10, pady=10)
-                      
-                              
-        mini_frame = tk.Frame(film_frame, bg="white")
-        mini_frame.pack(side="bottom", fill=tk.X)
-                              
+        #Variable
+        self.DateAdded = tk.Label(info_frame, padx=3, pady=3, bg="white")
+        self.DateAdded.pack()
+        self.DateAdded["textvariable"] = self.LabelDefault
+        
         remove = tk.Button(mini_frame, text="Remove Film", fg="white",bd=0, bg="#179184",width=20, height=2, command=film_frame.destroy) #, command=self.display_film) #creates button
         #remove["command"] = self.remove_film #create command when button is pressed
         remove.pack(side="right", padx=50, pady=10)
@@ -93,12 +108,8 @@ class Application(tk.Frame):
         film["command"] = self.display_film #create command when button is pressed
         film.pack(side="right", padx=50, pady=10) #placement of button
         
-        
         quit = tk.Button(bottom_frame, text="Close Application", fg="white",bd=0, bg="#af1700", width=20, height=2, command=self.master.destroy) #quit application button
         quit.pack(side="bottom", pady=10) #placement of button
-        
-        
-
 
         #text = tk.Entry(root, width=35, bg="#a1dbcd")
         #text.pack(side="top") 
@@ -130,33 +141,19 @@ class Application(tk.Frame):
     
     #------------Movie Search Function---------------#
     
-  #  def MovieSearch(self):
+    def MovieSearch(self, event=None):
+                
+        response = requests.get("http://www.omdbapi.com/?t=%s&apikey=3f3265e5" % (self.SearchContents.get()))
+        movie_dictionary_info = json.loads(response.text)
+        print(movie_dictionary_info)
         
-        #print(self.SearchContents.get())
-        #response = requests.get("http://www.omdbapi.com/?t=%s&apikey=3f3265e5" % (self.SearchContents.get()))
-        #print(response.content)
-        #print(omdb.get(title=self.SearchContents.get()))
+        self.TitleX = tk.StringVar()
+        self.TitleX.set(movie_dictionary_info.get("Title"))
+        self.MovieTitle["textvariable"] = self.TitleX
         
-  #      response = requests.get("http://www.omdbapi.com/?t=%s&apikey=3f3265e5" % (self.SearchContents.get()))
-  #      movie_dictionary_info = json.loads(response.text)
-  #      print(movie_dictionary_info)
-  #      
-  #      self.TitleX = tk.StringVar()
-  #      self.TitleX.set(movie_dictionary_info.get("Title"))
-  #      
-  #      self.YearX = tk.StringVar()
-  #      self.YearX.set(movie_dictionary_info.get("Year"))
-  #      
-  #      self.DirectorX = tk.StringVar()
-  #      self.DirectorX.set(movie_dictionary_info.get("Director"))
-  #      
-  #      self.GenreX = tk.StringVar()
-  #      self.GenreX.set(movie_dictionary_info.get("Genre"))
-  #      
-  #      self.MovieTitle["textvariable"] = self.TitleX
-  #      self.MovieYear["textvariable"] = self.YearX
-  #      self.MovieDirector["textvariable"] = self.DirectorX
-  #      self.MovieGenre["textvariable"] = self.GenreX
+        self.DateX = tk.StringVar()
+        self.DateX.set(now.strftime("%d:%m:%Y"))
+        self.DateAdded["textvariable"] = self.DateX
         
    # def text_update(film):
     #    film.text.delete(0, tk.END)
