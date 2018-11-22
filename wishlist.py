@@ -33,14 +33,56 @@ class Application(tk.Frame):
         
         wishlist_file= open("movie_wishlist.txt","r+")
         contents = wishlist_file.readlines()
-        count=0
+        count=5
         for each in contents:
             count += 1
+        wishlist_file.close()
         return count
     
-    def CreateMovieFrame(self):
-#============Film Frame with Objects=============#   
+#    def CreateMovieFrame(self):
+
+
+    def create_widgets(self):
         
+        #winfo_toplevel().title("Movie Information Client - Wishlist)
+
+#============Frame Declarations==================# 
+        
+        title_frame = tk.Frame(root, bg="#a1dbcd")
+        title_frame.pack(side="top", fill=tk.X)
+         
+        main_frame = tk.Frame(root, bg="#a1dbcd")
+        main_frame.pack(side="top", fill=tk.BOTH)
+        
+        #Scrollbar
+        scrollbar = tk.Scrollbar(main_frame)
+        scrollbar.pack(side="right", fill=tk.Y)
+        #main_frame.configure(tk.yscrollcommand=scrollbar.set)
+        
+        bottom_frame = tk.Frame(bg="#a1dbcd")
+        bottom_frame.pack(side="bottom", fill=tk.X)
+        
+        count = self.FileRead()
+        
+#============Search Widget=======================#   
+        
+        search_function = tk.Entry(title_frame, bg="white")
+        search_function.pack(side="right", padx=50, pady=10)
+        self.SearchContents = tk.StringVar()
+        self.SearchContents.set("Search Here")         
+        # tell the entry widget to watch this variable
+        search_function["textvariable"] = self.SearchContents
+        search_function.bind('<Key-Return>', self.MovieSearch)
+        
+        
+#============Default Declarations================#   
+        
+        self.LabelDefault = tk.StringVar()
+        self.LabelDefault.set("--")
+
+#        self.CreateMovieFrame(count, main_frame)
+#============Film Frame with Objects=============#   
+         
         for i in range(count):
         
             film_frame = tk.LabelFrame(main_frame, width=500, height=150, bg="white")
@@ -79,49 +121,9 @@ class Application(tk.Frame):
             film["command"] = self.display_film 
             #placement of button
             film.pack(side="right", padx=50, pady=10) 
+            
+            self.InfoDisplay()
    
-
-    def create_widgets(self):
-        
-        #winfo_toplevel().title("Movie Information Client - Wishlist)
-
-#============Frame Declarations==================# 
-        
-        title_frame = tk.Frame(root, bg="#a1dbcd")
-        title_frame.pack(side="top", fill=tk.X)
-         
-        main_frame = tk.Frame(root, bg="#a1dbcd")
-        main_frame.pack(side="top", fill=tk.BOTH)
-        
-        #Scrollbar
-        scrollbar = tk.Scrollbar(main_frame)
-        scrollbar.pack(side="right", fill=tk.Y)
-        #main_frame.configure(tk.yscrollcommand=scrollbar.set)
-        
-        bottom_frame = tk.Frame(bg="#a1dbcd")
-        bottom_frame.pack(side="bottom", fill=tk.X)
-        
-        count = self.FileRead()
-
-#============Search Widget=======================#   
-        
-        search_function = tk.Entry(title_frame, bg="white")
-        search_function.pack(side="right", padx=50, pady=10)
-        self.SearchContents = tk.StringVar()
-        self.SearchContents.set("Search Here")         
-        # tell the entry widget to watch this variable
-        search_function["textvariable"] = self.SearchContents
-        if search_function.bind('<Key-Return>', self.MovieSearch):
-            count=+1
-        
-#============Default Declarations================#   
-        
-        self.LabelDefault = tk.StringVar()
-        self.LabelDefault.set("--")
-  
-
-        self.CreateMovieFrame(count, main_frame)
-
 #============Labels and Buttons==================#
         
         home = tk.Button(title_frame, text="Home",fg="white", bd=0, bg="#179184",width=10, height=2)
@@ -139,6 +141,26 @@ class Application(tk.Frame):
         quit = tk.Button(bottom_frame, text="Quit", fg="white",bd=0, bg="#af1700", width=10, height=2, command=self.master.destroy)
         #placement of button
         quit.pack(pady=30) 
+        
+#------------Display Info Function---------------#
+        
+    def InfoDisplay(self):
+        
+        wishlist_file= open("movie_wishlist.txt","r+")
+        wishlist = []
+        wishlist = wishlist_file.readlines()
+        response = requests.get("http://www.omdbapi.com/?t=%s&apikey=3f3265e5" % (wishlist))
+        movie_dictionary_info = json.loads(response.text)
+        
+        self.TitleX = tk.StringVar()
+        self.TitleX.set(movie_dictionary_info.get("Title"))
+        self.MovieTitle["textvariable"] = self.TitleX
+        
+        self.DateX = tk.StringVar()
+        self.DateX.set(movie_dictionary_info.get("DateAdded"))
+        self.DateAdded["textvariable"] = self.DateX
+        
+        wishlist_file.close()
 
 #------------Display Film Function---------------#
 
@@ -167,7 +189,21 @@ class Application(tk.Frame):
         self.DateX.set(now.strftime("%d:%m:%Y"))
         self.DateAdded["textvariable"] = self.DateX
         
+        self.IMDbID = tk.StringVar()
+        self.IMDbID.set(movie_dictionary_info.get("imdbID"))
         
+        wishlist_file= open("movie_wishlist.txt","a+")
+        wishlist_file.write("http://www.omdbapi.com/?i=%s&apikey=3f3265e5" % self.IMDbID)
+        wishlist_file.close()
+        
+        self.DateAddedAppend()
+     
+    def DateAddedAppend(self):
+         
+        wishlist_file= open("movie_wishlist.txt","a+")
+        wishlist_file.write(now.strftime(",%d:%m:%Y"))
+        wishlist_file.close()
+     
 # run the GUI event loop          
 
                      
