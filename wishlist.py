@@ -22,7 +22,7 @@ class Application(tk.Frame):
         super().__init__(master)
         master = master
         master.title("Movie Information Client - Wishlist")
-        master.geometry("600x400+300+200")
+        master.geometry("600x1000+300+200")
         self.pack()
         self.create_widgets()
         master.configure(background="#a1dbcd")
@@ -33,7 +33,7 @@ class Application(tk.Frame):
         
         wishlist_file= open("movie_wishlist.txt","r+")
         contents = wishlist_file.readlines()
-        count=5
+        count=0
         for each in contents:
             count += 1
         wishlist_file.close()
@@ -111,7 +111,8 @@ class Application(tk.Frame):
             self.DateAdded["textvariable"] = self.LabelDefault
             
             #creates button
-            remove = tk.Button(mini_frame, text="Remove Film", fg="white",bd=0, bg="#179184",width=20, height=2, command=film_frame.destroy) 
+            remove = tk.Button(mini_frame, text="Remove Film", fg="white",bd=0, bg="#179184",width=20, height=2, command=film_frame.destroy)
+            remove['command'] = self.RemoveFilm()
             #placement of button
             remove.pack(side="right", padx=50, pady=10)
             
@@ -122,7 +123,7 @@ class Application(tk.Frame):
             #placement of button
             film.pack(side="right", padx=50, pady=10) 
             
-            self.InfoDisplay()
+            self.InfoDisplay(i)
    
 #============Labels and Buttons==================#
         
@@ -144,22 +145,27 @@ class Application(tk.Frame):
         
 #------------Display Info Function---------------#
         
-    def InfoDisplay(self):
+    def InfoDisplay(self, i):
         
-        wishlist_file= open("movie_wishlist.txt","r+")
-        wishlist = []
-        wishlist = wishlist_file.readlines()
-        response = requests.get("http://www.omdbapi.com/?t=%s&apikey=3f3265e5" % (wishlist))
-        movie_dictionary_info = json.loads(response.text)
-        
-        self.TitleX = tk.StringVar()
-        self.TitleX.set(movie_dictionary_info.get("Title"))
-        self.MovieTitle["textvariable"] = self.TitleX
-        
-        self.DateX = tk.StringVar()
-        self.DateX.set(movie_dictionary_info.get("DateAdded"))
-        self.DateAdded["textvariable"] = self.DateX
-        
+        with open("movie_wishlist.txt","r+") as wishlist_file:
+            for idx, line in enumerate(wishlist_file):
+                if idx == i:
+                    wishlist = line.split(',')
+                    wishlist_data = wishlist[0]
+                    date_data = wishlist[1]
+
+                    response = requests.get(wishlist_data)
+                    dictionary_info = json.loads(response.text)
+                
+                    self.TitleX = tk.StringVar()
+                    self.TitleX.set(dictionary_info.get("Title"))
+                    self.MovieTitle["textvariable"] = self.TitleX
+                    
+                    self.DateX = tk.StringVar()
+                    self.DateX.set(date_data)
+                    self.DateAdded["textvariable"] = self.DateX
+                
+                
         wishlist_file.close()
 
 #------------Display Film Function---------------#
@@ -193,7 +199,7 @@ class Application(tk.Frame):
         self.IMDbID.set(movie_dictionary_info.get("imdbID"))
         
         wishlist_file= open("movie_wishlist.txt","a+")
-        wishlist_file.write("http://www.omdbapi.com/?i=%s&apikey=3f3265e5" % self.IMDbID)
+        wishlist_file.write("\nhttp://www.omdbapi.com/?i=%s&apikey=3f3265e5" % self.IMDbID.get())
         wishlist_file.close()
         
         self.DateAddedAppend()
@@ -205,7 +211,12 @@ class Application(tk.Frame):
         wishlist_file.close()
      
 # run the GUI event loop          
-
+    def RemoveFilm(self):
+        with open("movie_wishlist.txt","w+") as wishlist_file:
+            for idx, line in enumerate(wishlist_file):
+                if idx == i:
+                    
+        
                      
         
 app = Application(master=root)
