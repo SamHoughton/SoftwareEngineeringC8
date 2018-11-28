@@ -111,8 +111,8 @@ class Application(tk.Frame):
             self.DateAdded["textvariable"] = self.LabelDefault
             
             #creates button
-            remove = tk.Button(mini_frame, text="Remove Film", fg="white",bd=0, bg="#179184",width=20, height=2, command=film_frame.destroy)
-            remove['command'] = self.RemoveFilm()
+            remove = tk.Button(mini_frame, text="Remove Film", fg="white",bd=0, bg="#179184",width=20, height=2)
+            remove['command'] = (lambda i=i: self.RemoveFilm(i))
             #placement of button
             remove.pack(side="right", padx=50, pady=10)
             
@@ -211,12 +211,14 @@ class Application(tk.Frame):
         wishlist_file.close()
      
 # run the GUI event loop          
-    def RemoveFilm(self):
+    def RemoveFilm(self, i):
+        print('in')
         with open("movie_wishlist.txt","w+") as wishlist_file:
             for idx, line in enumerate(wishlist_file):
                 if idx == i:
-                    
-        
+                    line.write()
+        wishlist_file.close()
+        #film_frame['bg']='red'
                      
         
 app = Application(master=root)
