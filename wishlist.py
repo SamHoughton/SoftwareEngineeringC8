@@ -15,6 +15,7 @@ root = tk.Tk()
 titleFont = font.Font(family = "Helvetica", size = 36, weight = "bold")
 font.families()
 
+UPDATE_RATE = 10000
 
 class Application(tk.Frame):
     
@@ -24,11 +25,18 @@ class Application(tk.Frame):
         master.title("Movie Information Client - Wishlist")
         master.geometry("600x1000+300+200")
         self.pack()
-        self.create_widgets()
-        master.configure(background="#a1dbcd")
-        #self.master.geometry("400*600")
+        
+        #============Core Frame Refresh==================#
 
-                 
+        title_frame, main_frame, bottom_frame = self.create_frames()
+                    
+        self.create_widgets(title_frame, main_frame, bottom_frame)
+        master.configure(background="#a1dbcd")
+#        self.updater(title_frame, main_frame, bottom_frame)
+
+          
+#------------File Read Function------------------#
+                       
     def FileRead(self):
         
         wishlist_file= open("movie_wishlist.txt","r+")
@@ -38,14 +46,11 @@ class Application(tk.Frame):
             count += 1
         wishlist_file.close()
         return count
-    
-#    def CreateMovieFrame(self):
-
-
-    def create_widgets(self):
         
-        #winfo_toplevel().title("Movie Information Client - Wishlist)
-
+#------------Create Frames Function--------------#
+        
+    def create_frames(self):
+               
 #============Frame Declarations==================# 
         
         title_frame = tk.Frame(root, bg="#a1dbcd")
@@ -61,26 +66,26 @@ class Application(tk.Frame):
         
         bottom_frame = tk.Frame(bg="#a1dbcd")
         bottom_frame.pack(side="bottom", fill=tk.X)
+                
+        return title_frame, main_frame, bottom_frame
         
-        count = self.FileRead()
+#------------Frame Reset Function----------------#
         
-#============Search Widget=======================#   
-        
-        search_function = tk.Entry(title_frame, bg="white")
-        search_function.pack(side="right", padx=50, pady=10)
-        self.SearchContents = tk.StringVar()
-        self.SearchContents.set("Search Here")         
-        # tell the entry widget to watch this variable
-        search_function["textvariable"] = self.SearchContents
-        search_function.bind('<Key-Return>', self.MovieSearch)
-        
-        
-#============Default Declarations================#   
-        
-        self.LabelDefault = tk.StringVar()
-        self.LabelDefault.set("--")
+    def frame_reset(self, main_frame, title_frame, bottom_frame):
 
-#        self.CreateMovieFrame(count, main_frame)
+#============Frame Reset=========================# 
+
+        main_frame.destroy()
+        title_frame.destroy()
+        bottom_frame.destroy()
+        self.updater()
+        
+#------------Create Film Frames Function---------#
+        
+    def create_film_frames(self, main_frame):
+       
+        count = self.FileRead()
+
 #============Film Frame with Objects=============#   
          
         for i in range(count):
@@ -112,7 +117,7 @@ class Application(tk.Frame):
             
             #creates button
             remove = tk.Button(mini_frame, text="Remove Film", fg="white",bd=0, bg="#179184",width=20, height=2)
-            remove['command'] = (lambda i=i: self.RemoveFilm(i))
+            remove['command'] = (film_frame.destroy, lambda i=i: self.RemoveFilm(i))
             #placement of button
             remove.pack(side="right", padx=50, pady=10)
             
@@ -124,6 +129,34 @@ class Application(tk.Frame):
             film.pack(side="right", padx=50, pady=10) 
             
             self.InfoDisplay(i)
+
+
+
+
+
+        
+#------------Create Widgets Function-------------#
+        
+    def create_widgets(self, title_frame, main_frame, bottom_frame):
+
+#============Search Widget=======================#   
+        
+        search_function = tk.Entry(title_frame, bg="white")
+        search_function.pack(side="right", padx=50, pady=10)
+        self.SearchContents = tk.StringVar()
+        self.SearchContents.set("Search Here")         
+        # tell the entry widget to watch this variable
+        search_function["textvariable"] = self.SearchContents
+        search_function.bind('<Key-Return>', self.MovieSearch, self.frame_reset(main_frame, title_frame, bottom_frame))
+                
+#============Default Declarations================#   
+        
+        self.LabelDefault = tk.StringVar()
+        self.LabelDefault.set("--")
+                
+#============Create Film Frames==================# 
+        
+        self.create_film_frames(main_frame)
    
 #============Labels and Buttons==================#
         
@@ -142,6 +175,12 @@ class Application(tk.Frame):
         quit = tk.Button(bottom_frame, text="Quit", fg="white",bd=0, bg="#af1700", width=10, height=2, command=self.master.destroy)
         #placement of button
         quit.pack(pady=30) 
+
+
+
+
+
+
         
 #------------Display Info Function---------------#
         
@@ -182,18 +221,10 @@ class Application(tk.Frame):
 #------------Movie Search Function---------------#
     
     def MovieSearch(self, event=None):
-                
+            
         response = requests.get("http://www.omdbapi.com/?t=%s&apikey=3f3265e5" % (self.SearchContents.get()))
         movie_dictionary_info = json.loads(response.text)
         print(movie_dictionary_info)
-        
-        self.TitleX = tk.StringVar()
-        self.TitleX.set(movie_dictionary_info.get("Title"))
-        self.MovieTitle["textvariable"] = self.TitleX
-        
-        self.DateX = tk.StringVar()
-        self.DateX.set(now.strftime("%d:%m:%Y"))
-        self.DateAdded["textvariable"] = self.DateX
         
         self.IMDbID = tk.StringVar()
         self.IMDbID.set(movie_dictionary_info.get("imdbID"))
@@ -203,13 +234,17 @@ class Application(tk.Frame):
         wishlist_file.close()
         
         self.DateAddedAppend()
-     
+        
+#------------Date Append Function----------------#
+             
     def DateAddedAppend(self):
          
         wishlist_file= open("movie_wishlist.txt","a+")
         wishlist_file.write(now.strftime(",%d:%m:%Y"))
         wishlist_file.close()
-     
+             
+#------------Remove Film Function----------------#
+        
 # run the GUI event loop          
     def RemoveFilm(self, i):
         print('in')
@@ -219,7 +254,13 @@ class Application(tk.Frame):
                     line.write()
         wishlist_file.close()
         #film_frame['bg']='red'
-                     
+         
+#------------Update Display Function-------------#
+                
+    def updater(self):
+        print('update')
+        title_frame, main_frame, bottom_frame = self.create_frames()
+        self.after(UPDATE_RATE, self.updater)            
         
 app = Application(master=root)
 app.mainloop()
