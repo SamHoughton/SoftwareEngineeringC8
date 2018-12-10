@@ -90,7 +90,7 @@ class Application(tk.Frame):
          
         for i in range(count):
         
-            film_frame = tk.LabelFrame(main_frame, width=500, height=150, bg="white")
+            film_frame = tk.LabelFrame(main_frame, width=300, height=100, bg="white")
             film_frame.pack(side="top")
             
             info_frame = tk.Frame(film_frame, bg="white")
@@ -101,7 +101,7 @@ class Application(tk.Frame):
                 
             title = tk.Label(info_frame, bg="white")
             title["text"] = "Film Title:"
-            title.pack(side="top", padx=10, pady=10)
+            title.pack(side="top", padx=5, pady=5)
             #Variable
             self.MovieTitle = tk.Label(info_frame, padx=3, pady=3, bg="white")
             self.MovieTitle.pack()
@@ -109,7 +109,7 @@ class Application(tk.Frame):
             
             date = tk.Label(info_frame, bg="white")
             date["text"] = "Date Added to Wishlist:"
-            date.pack(side="top", padx=10, pady=10)
+            date.pack(side="top", padx=5, pady=5)
             #Variable
             self.DateAdded = tk.Label(info_frame, padx=3, pady=3, bg="white")
             self.DateAdded.pack()
@@ -117,16 +117,16 @@ class Application(tk.Frame):
             
             #creates button
             remove = tk.Button(mini_frame, text="Remove Film", fg="white",bd=0, bg="#179184",width=20, height=2)
-            remove['command'] = (film_frame.destroy, lambda i=i: self.RemoveFilm(i))
+            remove['command'] = (lambda i=i: self.RemoveFilm(i, film_frame))
             #placement of button
-            remove.pack(side="right", padx=50, pady=10)
+            remove.pack(side="right", padx=25, pady=5)
             
             #creates button
             film = tk.Button(mini_frame, text="Show Film Info",fg="white", bd=0, bg="#179184",width=20, height=2) 
             #create command when button is pressed
-            film["command"] = self.display_film 
+            film["command"] = lambda i=i: self.display_film(i) 
             #placement of button
-            film.pack(side="right", padx=50, pady=10) 
+            film.pack(side="right", padx=25, pady=5) 
             
             self.InfoDisplay(i)
 
@@ -139,15 +139,15 @@ class Application(tk.Frame):
         
     def create_widgets(self, title_frame, main_frame, bottom_frame):
 
-#============Search Widget=======================#   
-        
-        search_function = tk.Entry(title_frame, bg="white")
-        search_function.pack(side="right", padx=50, pady=10)
-        self.SearchContents = tk.StringVar()
-        self.SearchContents.set("Search Here")         
-        # tell the entry widget to watch this variable
-        search_function["textvariable"] = self.SearchContents
-        search_function.bind('<Key-Return>', self.MovieSearch, self.frame_reset(main_frame, title_frame, bottom_frame))
+##============Search Widget=======================#   
+#        
+#        search_function = tk.Entry(title_frame, bg="white")
+#        search_function.pack(side="right", padx=50, pady=10)
+#        self.SearchContents = tk.StringVar()
+#        self.SearchContents.set("Search Here")         
+#        # tell the entry widget to watch this variable
+#        search_function["textvariable"] = self.SearchContents
+#        search_function.bind('<Key-Return>', self.MovieSearch, self.frame_reset)
                 
 #============Default Declarations================#   
         
@@ -175,12 +175,6 @@ class Application(tk.Frame):
         quit = tk.Button(bottom_frame, text="Quit", fg="white",bd=0, bg="#af1700", width=10, height=2, command=self.master.destroy)
         #placement of button
         quit.pack(pady=30) 
-
-
-
-
-
-
         
 #------------Display Info Function---------------#
         
@@ -202,65 +196,94 @@ class Application(tk.Frame):
                     
                     self.DateX = tk.StringVar()
                     self.DateX.set(date_data)
-                    self.DateAdded["textvariable"] = self.DateX
-                
+                    self.DateAdded["textvariable"] = self.DateX                
                 
         wishlist_file.close()
 
 #------------Display Film Function---------------#
 
     #display_film button command
-    def display_film(self): 
+    def display_film(self, i): 
         
         film_description = tk.Entry
         film_description = tk.Toplevel(root, bg="#a1dbcd")
-        
-        tk.Label(film_description, text='Film Title:\nDate of Release:\nDirector:\nCast:\nDate Added to Wishlist:\nFilm Description:', bg="#a1dbcd").pack(side="left", padx=30, pady=30)
-    
-    
-#------------Movie Search Function---------------#
-    
-    def MovieSearch(self, event=None):
-            
-        response = requests.get("http://www.omdbapi.com/?t=%s&apikey=3f3265e5" % (self.SearchContents.get()))
-        movie_dictionary_info = json.loads(response.text)
-        print(movie_dictionary_info)
-        
-        self.IMDbID = tk.StringVar()
-        self.IMDbID.set(movie_dictionary_info.get("imdbID"))
-        
-        wishlist_file= open("movie_wishlist.txt","a+")
-        wishlist_file.write("\nhttp://www.omdbapi.com/?i=%s&apikey=3f3265e5" % self.IMDbID.get())
+                
+        with open("movie_wishlist.txt","r+") as wishlist_file:
+            for idx, line in enumerate(wishlist_file):
+                if idx == i:
+                    wishlist = line.split(',')
+                    wishlist_data = wishlist[0]
+                    #date_data = wishlist[1]
+
+                    response = requests.get(wishlist_data)
+                    dictionary_info = json.loads(response.text)
+                
+                    self.TitleX = tk.StringVar()
+                    self.TitleX.set(dictionary_info.get("Title"))
+                    #self.MovieTitle["textvariable"] = self.TitleX
+                    
+                    self.DateX = tk.StringVar()
+                    self.DateX.set(dictionary_info.get("Released"))
+                   # self.DateRelease["textvariable"] = self.DateX
+                   
+                    self.DirectorX = tk.StringVar()
+                    self.DirectorX.set(dictionary_info.get("Director"))
+                    
+                    self.CastX = tk.StringVar()
+                    self.CastX.set(dictionary_info.get("Actors"))
+                    
+                    self.PlotX = tk.StringVar()
+                    self.PlotX.set(dictionary_info.get("Plot"))
+                    
+                    tk.Label(film_description, text='Film Title: %s\nDate of Release: %s\nDirector: %s\nCast: %s\nFilm Description: %s' % (self.TitleX.get(), self.DateX.get(), self.DirectorX.get(), self.CastX.get(), self.PlotX.get()), bg="#a1dbcd").pack(side="left", padx=30, pady=30)
+                
+                
         wishlist_file.close()
-        
-        self.DateAddedAppend()
-        
-#------------Date Append Function----------------#
-             
-    def DateAddedAppend(self):
-         
-        wishlist_file= open("movie_wishlist.txt","a+")
-        wishlist_file.write(now.strftime(",%d:%m:%Y"))
-        wishlist_file.close()
-             
+        print(i)
+        f = 'floccinaucinihilipilification'
+        print(f)
+    
+##------------Movie Search Function---------------#
+#    
+#    def MovieSearch(self, event=None):
+#            
+#        response = requests.get("http://www.omdbapi.com/?t=%s&apikey=3f3265e5" % (self.SearchContents.get()))
+#        movie_dictionary_info = json.loads(response.text)
+#        print(movie_dictionary_info)
+#        
+#        self.IMDbID = tk.StringVar()
+#        self.IMDbID.set(movie_dictionary_info.get("imdbID"))
+#        
+#        wishlist_file= open("movie_wishlist.txt","a+")
+#        wishlist_file.write("\nhttp://www.omdbapi.com/?i=%s&apikey=3f3265e5" % self.IMDbID.get())
+#        wishlist_file.close()
+#        
+#        self.DateAddedAppend()
+#        
+##------------Date Append Function----------------#
+#             
+#    def DateAddedAppend(self):
+#         
+#        wishlist_file= open("movie_wishlist.txt","a+")
+#        wishlist_file.write(now.strftime(",%d:%m:%Y"))
+#        wishlist_file.close()
+#             
 #------------Remove Film Function----------------#
         
 # run the GUI event loop          
-    def RemoveFilm(self, i):
+    def RemoveFilm(self, i, film_frame):
         print('in')
-        with open("movie_wishlist.txt","w+") as wishlist_file:
-            for idx, line in enumerate(wishlist_file):
-                if idx == i:
-                    line.write()
-        wishlist_file.close()
-        #film_frame['bg']='red'
-         
-#------------Update Display Function-------------#
-                
-    def updater(self):
-        print('update')
-        title_frame, main_frame, bottom_frame = self.create_frames()
-        self.after(UPDATE_RATE, self.updater)            
+        wishlist = open("movie_wishlist.txt","r")
+        lines = wishlist.readlines()
+        wishlist.close()
+        wishlist = open("movie_wishlist.txt","w")
+        idx = 0
+        for line in lines:
+            if idx != i:
+                wishlist.write(line)
+            idx=idx+1
+        wishlist.close()
+        film_frame.destroy()
         
 app = Application(master=root)
 app.mainloop()
