@@ -214,8 +214,9 @@ class Application(tk.Frame):
                     wishlist = line.split(',')
                     wishlist_data = wishlist[0]
                     #date_data = wishlist[1]
-
-                    response = requests.get(wishlist_data)
+                    
+                    
+                    
                     dictionary_info = json.loads(response.text)
                 
                     self.TitleX = tk.StringVar()
